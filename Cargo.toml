@@ -1,0 +1,10 @@
+[package]
+name = "tracking"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rusqlite = "0.29.0"
+json = "0.12.4"
+lazy_static = "1.4.0"
+chrono = "0.4.31"
