@@ -35,7 +35,7 @@ fn main() {
     let now = Local::now();
     let zero_hour = Local.with_ymd_and_hms(now.year(), now.month(), now.day(), 0, 0, 0).unwrap();
     let twenty_fourth_hour = zero_hour.checked_add_days(Days::new(1)).unwrap();
-    let query = &format!("select class, count (*) FROM tracking where ts > {} and ts < {} group by class;", zero_hour.timestamp(), twenty_fourth_hour.timestamp());
+    let query = &format!("select class, count (*) FROM tracking where ts > {} and ts < {} and class not like 'idle' and class not like 'feh' group by class order by count (*) desc;", zero_hour.timestamp(), twenty_fourth_hour.timestamp());
     let mut stmt = conn.prepare(query).unwrap();
     
     let res = stmt.query_map((), |row| {
@@ -57,7 +57,6 @@ fn main() {
         }
     }
     
-    counts.sort_by(|a, b| b.count.partial_cmp(&a.count).unwrap());
     let nb = min(counts.len(), 3);
     let mut output = fmt(Duration::seconds(count * 10));
     for i in 0..nb {
