@@ -3,11 +3,20 @@ use chrono::prelude::*;
 use chrono::naive::Days;
 use chrono::{Datelike, Local, Duration};
 use std::env;
+use clap::Parser;
 
 #[derive(Debug)]
 struct Res {
     class: String,
     count: i64,
+}
+
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    database: Option<String>,
 }
 
 fn min(a: usize, b: usize) -> usize {
@@ -27,9 +36,10 @@ fn main() {
     } else {
         "tracking.db".to_string()
     };
-    let args: Vec<String> = env::args().collect();
-    if args.len() > 1 {
-        db = args[1].clone();
+
+    let args = Args::parse();
+    if args.database.is_some() {
+        db = args.database.unwrap();
     }
     let conn = Connection::open(&db).unwrap();
     let now = Local::now();
@@ -44,7 +54,6 @@ fn main() {
             count: row.get(1)?,
         })
     }).unwrap();
-    //let count: i64 = conn.query_row(query, [], |row| row.get(0)).unwrap();
     
     
     let mut counts = vec![];
@@ -52,9 +61,7 @@ fn main() {
     for r in res {
         let c = r.unwrap();
         count += c.count;
-        if c.class != "feh" {
-            counts.push(c);
-        }
+        counts.push(c);
     }
     
     let nb = min(counts.len(), 3);

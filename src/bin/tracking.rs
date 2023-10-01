@@ -6,6 +6,15 @@ use std::process::Command;
 use json;
 use chrono::Local;
 use lazy_static::lazy_static;
+use clap::Parser;
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    database: Option<String>,
+}
+
 
 #[derive(Debug)]
 struct FocusEntry {
@@ -40,9 +49,10 @@ fn main() {
     } else {
         "tracking.db".to_string()
     };
-    let args: Vec<String> = env::args().collect();
-    if args.len() > 1 {
-        db = args[1].clone();
+
+    let args = Args::parse();
+    if args.database.is_some() {
+        db = args.database.unwrap();
     }
     let conn = Connection::open(&db).unwrap();
     conn.execute(
