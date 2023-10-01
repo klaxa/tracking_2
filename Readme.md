@@ -16,6 +16,8 @@ The location of the database defaults to `tracking.db` in the current
 directory. This value can either be set with the `-d` flag or by setting the
 environment variable `TRACKING_DB` to the path you wish to use.
 
+To compile the programs, simply clone the repository and run `cargo build` or `cargo build --release`
+
 `gen_graph` creates daily graphs of the tracked data including some statistics.
 
 The following usage message can also be obtained by running `gen_graph -h`:
