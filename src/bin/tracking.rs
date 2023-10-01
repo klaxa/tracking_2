@@ -1,7 +1,7 @@
 use rusqlite::Connection;
 use std::env;
 use std::thread::sleep;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use std::process::Command;
 use json;
 use chrono::Local;
@@ -39,7 +39,7 @@ fn get_focused_window(obj: &json::JsonValue) -> &json::JsonValue {
             }
         }
     }
-    
+
     return &EMPTY;
 }
 
@@ -65,12 +65,13 @@ fn main() {
     (),
     ).unwrap();
     loop {
-        
+        let inow = Instant::now();
+
         let output = Command::new("i3-msg").args(["-t", "get_tree"]).output().expect("Could not call i3-msg -t get_tree");
         let output = String::from_utf8(output.stdout).unwrap_or_default();
         let output = json::parse(&output).unwrap_or(json::JsonValue::Null);
         let focus = get_focused_window(&output);
-        
+
         let now = Local::now().timestamp().to_string();
         let focus_entry = if focus["window_properties"].is_null() {
             FocusEntry {
@@ -89,6 +90,8 @@ fn main() {
             "INSERT INTO tracking (class, title, ts) values (?1, ?2, ?3);",
                     &[&focus_entry.class, &focus_entry.title, &focus_entry.ts],
         ).unwrap();
-        sleep(Duration::from_secs(10));
+
+
+        sleep(Duration::from_secs(10) - inow.elapsed());
     }
 }
