@@ -286,7 +286,7 @@ fn main() {
             month_started_hours = month_started_hours.checked_add(&duration).unwrap();
             y += TEXT_BLOCK_SIZE;
 
-            if cur.weekday().eq(&Weekday::Sun) {
+            if cur.weekday().eq(&Weekday::Sun) || cur.date_naive().eq(&end.date_naive()) {
                 backend.draw(&Text::new(fmt(week_actual_hours), (BAR_MARGIN * 2 + TEXT_MARGIN, y + TEXT_MARGIN), style.clone())).unwrap();
                 y += TEXT_BLOCK_SIZE;
                 backend.draw(&Text::new(fmt(week_started_hours), (BAR_MARGIN * 2 + TEXT_MARGIN, y + TEXT_MARGIN), style.clone())).unwrap();
@@ -296,7 +296,7 @@ fn main() {
             }
 
             let tomorrow = cur.checked_add_days(Days::new(1)).unwrap();
-            if tomorrow.month() != cur.month() {
+            if tomorrow.month() != cur.month() || cur.date_naive().eq(&end.date_naive()) {
                 backend.draw(&Text::new(fmt(month_actual_hours), (BAR_MARGIN * 2 + TEXT_MARGIN, y + TEXT_MARGIN), style.clone())).unwrap();
                 y += TEXT_BLOCK_SIZE;
                 backend.draw(&Text::new(fmt(month_started_hours), (BAR_MARGIN * 2 + TEXT_MARGIN, y + TEXT_MARGIN), style.clone())).unwrap();
