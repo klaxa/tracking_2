@@ -239,7 +239,7 @@ fn main() {
 
     res.for_each(|r| {
         let row = r.unwrap();
-        if row.ts > day_end {
+        while row.ts > day_end {
            cur = cur.checked_add_days(Days::new(1)).unwrap();
            day_end = cur.with_hour(23).unwrap().with_minute(59).unwrap().with_second(59).unwrap().timestamp();
            day_data.push(cur_day_data.clone());
