@@ -1,4 +1,3 @@
-
 Track yo'self 2
 ===============
 
@@ -38,5 +37,19 @@ Options:
   -V, --version              Print version
 ```
 
+Example chart:
 
-`screentime` uses the same combination of either using the `-d` flag, the envirnment variable or the fallback of `tracking.db` in the current directory and outputs the screentime for the current day with the top 3 types of programs and their corresponding screentime. Using the `-s` flag, a different start time from `0:00` can be chosen.
+![chart](https://github.com/klaxa/tracking_2/assets/1451995/7738cc63-8571-4392-91cb-76838c787c8f)
+
+`screentime` uses the same combination of either using the `-d` flag, the envirnment variable or the fallback of `tracking.db` in the current directory and outputs the screentime for the current day with the top 3 types of programs and their corresponding screentime. Using the `-s` flag, a different start time from `0:00` can be chosen. The output of this program is suited for use in i3blocks. The following configuration can be used:
+
+```
+[screentime]
+command=/path/to/screentime -d /path/to/tracking.db -s 6:00
+interval=10
+```
+
+
+Example i3blocks output:
+
+![i3blocks](https://github.com/klaxa/tracking_2/assets/1451995/8ce47530-84e4-4675-b1fc-a8466d4797e1)
