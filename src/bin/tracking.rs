@@ -60,7 +60,7 @@ fn main() {
             id integer primary key,
             class text not null,
             title text not null,
-            ts integer not null
+            ts integer not null unique
     );",
     (),
     ).unwrap();
