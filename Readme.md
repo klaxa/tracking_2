@@ -41,7 +41,7 @@ Options:
 
 Example chart:
 
-![chart](https://github.com/klaxa/tracking_2/assets/1451995/7738cc63-8571-4392-91cb-76838c787c8f)
+![chart](https://github.com/klaxa/tracking_2/assets/1451995/23fa427b-3f9a-4b36-b793-96203ab2f84d)
 
 `screentime` uses the same combination of either using the `-d` flag, the envirnment variable or the fallback of `tracking.db` in the current directory and outputs the screentime for the current day with the top 3 types of programs and their corresponding screentime. Using the `-s` flag, a different start time from `0:00` can be chosen. The output of this program is suited for use in i3blocks. The following configuration can be used:
 
