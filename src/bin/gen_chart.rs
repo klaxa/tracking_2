@@ -174,7 +174,7 @@ fn main() {
     let query = if args.idle.is_some() && args.idle.unwrap() {
         format!("select class, ts FROM tracking where ts > {} and ts < {} order by ts asc;", start.timestamp(), end.timestamp())
     } else {
-        format!("select class, ts FROM tracking where ts > {} and ts < {} and class not like 'idle' and class not like 'feh' order by ts asc;", start.timestamp(), end.timestamp())
+        format!("select class, ts FROM tracking where ts > {} and ts < {} and idle not like 1 order by ts asc;", start.timestamp(), end.timestamp())
     };
     let mut stmt = conn.prepare(&query).unwrap();
 
@@ -188,7 +188,7 @@ fn main() {
     let query = if args.idle.is_some() && args.idle.unwrap() {
         format!("select class, count (*) FROM tracking where ts > {} and ts < {} group by class order by count (*) desc;", start.timestamp(), end.timestamp())
     } else {
-        format!("select class, count (*) FROM tracking where ts > {} and ts < {} and class not like 'idle' and class not like 'feh' group by class order by count (*) desc;", start.timestamp(), end.timestamp())
+        format!("select class, count (*) FROM tracking where ts > {} and ts < {} and idle not like 1 group by class order by count (*) desc;", start.timestamp(), end.timestamp())
     };
     let mut stmt = conn.prepare(&query).unwrap();
 

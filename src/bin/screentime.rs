@@ -69,7 +69,7 @@ fn main() {
         zero_hour = zero_hour.checked_sub_days(Days::new(1)).unwrap();
     }
     let twenty_fourth_hour = zero_hour.checked_add_days(Days::new(1)).unwrap();
-    let query = &format!("select class, count (*) FROM tracking where ts > {} and ts < {} and class not like 'idle' and class not like 'feh' group by class order by count (*) desc;", zero_hour.timestamp(), twenty_fourth_hour.timestamp());
+    let query = &format!("select class, count (*) FROM tracking where ts > {} and ts < {} and idle not like 1 group by class order by count (*) desc;", zero_hour.timestamp(), twenty_fourth_hour.timestamp());
     let mut stmt = conn.prepare(query).unwrap();
 
     let res = stmt.query_map((), |row| {

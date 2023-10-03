@@ -1,7 +1,9 @@
 Track yo'self 2
 ===============
 
-This set of programs tracks your i3 window focus and stores it in an sqlite3 file-backed database.
+This set of programs tracks your i3 window focus and stores it in an sqlite3
+file-backed database.
+
 This project is the successor project of [klaxa/tracking](https://github.com/klaxa/tracking).
 
 Usage
@@ -16,7 +18,32 @@ The location of the database defaults to `tracking.db` in the current
 directory. This value can either be set with the `-d` flag or by setting the
 environment variable `TRACKING_DB` to the path you wish to use.
 
-To compile the programs, simply clone the repository and run `cargo build` or `cargo build --release`
+An optional locking-file to decide if the current data should be recorded as
+an idle state can be defined with the environment variable `TRACKING_IDLE_FILE`
+and defaults to `/tmp/tracking-idle`. The included script `res/idle_button.sh`
+acts as a display and button for i3blocks and displays a red dot when the data
+is being recorded without the idle flag and a pause symbol when the data is
+being recorded with the idle flag. Clicking the block deletes the lock file if
+it exists and creates it if it doesn't, effectively toggling between idle and
+non-idle states.
+
+Included also are systemd timer and service files to easily backup the
+tracking database on a daily basis. This is useful for example to make a copy
+to a synced folder like nextcloud to keep backups without writing to the
+server constantly. These files are `res/backup-tracking-db.timer` and
+`res/backup-tracking-db.service` respectively. To expose these, create the
+directory `~/.config/systemd/user/` if it doesn't already exist and copy the
+timer and service files into it after modifying the paths and times to your
+needs. To enable the timer run:
+
+```
+systemctl --user daemon-reload
+systemctl --user enable backup-tracking-db.timer
+
+```
+
+To compile the programs, simply clone the repository and run `cargo build` or
+`cargo build --release`.
 
 `gen_graph` creates daily graphs of the tracked data including some statistics.
 
@@ -43,15 +70,27 @@ Example chart:
 
 ![chart](https://github.com/klaxa/tracking_2/assets/1451995/23fa427b-3f9a-4b36-b793-96203ab2f84d)
 
-`screentime` uses the same combination of either using the `-d` flag, the envirnment variable or the fallback of `tracking.db` in the current directory and outputs the screentime for the current day with the top 3 types of programs and their corresponding screentime. Using the `-s` flag, a different start time from `0:00` can be chosen. The output of this program is suited for use in i3blocks. The following configuration can be used:
+`screentime` uses the same combination of either using the `-d` flag, the
+envirnment variable or the fallback of `tracking.db` in the current directory
+and outputs the screentime for the current day with the top 3 types of
+programs and their corresponding screentime. Using the `-s` flag, a different
+start time from `0:00` can be chosen. The output of this program is suited for
+use in i3blocks.
+
+The following configuration for `screentime` and `res/idle_button.sh` can b
+used and is also found in `res/i3blocks.snippet.conf`:
 
 ```
 [screentime]
 command=/path/to/screentime -d /path/to/tracking.db -s 6:00
 interval=10
-```
 
+[tracking-idle-toggle]
+command=/path/to/idle_button.sh $button
+interval=1
+```
 
 Example i3blocks output:
 
 ![i3blocks](https://github.com/klaxa/tracking_2/assets/1451995/8ce47530-84e4-4675-b1fc-a8466d4797e1)
+

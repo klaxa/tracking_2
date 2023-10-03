@@ -1,0 +1,5 @@
+[Unit]
+Description=Backup tracking.db
+
+[Service]
+ExecStart=/usr/bin/cp $TRACKING_DB $HOME/Nextcloud/tracking/private/tracking.db
