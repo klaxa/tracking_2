@@ -90,7 +90,12 @@ command=/path/to/idle_button.sh $button
 interval=1
 ```
 
-Example i3blocks output:
+Example i3blocks outputs:
 
-![i3blocks](https://github.com/klaxa/tracking_2/assets/1451995/8ce47530-84e4-4675-b1fc-a8466d4797e1)
+When not idle the red dot alternates between bright and dark red:
 
+![i3blocks](https://github.com/klaxa/tracking_2/assets/1451995/c373152e-3d32-455a-b4c9-a277c4ef1903)
+
+When idle the displayed symbol is a solid pause icon:
+
+![i3blocks-idle](https://github.com/klaxa/tracking_2/assets/1451995/58f50a6e-596a-4207-aaf6-3e3ff7c43cd6)
