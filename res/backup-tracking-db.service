@@ -2,4 +2,4 @@
 Description=Backup tracking.db
 
 [Service]
-ExecStart=/usr/bin/cp $TRACKING_DB $HOME/Nextcloud/tracking/private/tracking.db
+ExecStart=/usr/bin/cp /path/to/tracking.db /path/to/backup/dir/tracking.db
