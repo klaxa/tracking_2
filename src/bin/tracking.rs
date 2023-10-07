@@ -1,13 +1,13 @@
 use rusqlite::Connection;
 use std::env;
 use std::path::Path;
-use std::thread::sleep;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 use std::process::Command;
 use json;
 use chrono::Local;
 use lazy_static::lazy_static;
 use clap::Parser;
+use tokio::time;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -47,7 +47,8 @@ fn get_focused_window(obj: &json::JsonValue) -> &json::JsonValue {
     return &EMPTY;
 }
 
-fn main() {
+#[tokio::main(flavor = "current_thread")]
+async fn main() {
     let mut db = if let Ok(s) = env::var("TRACKING_DB") {
         s
     } else {
@@ -81,8 +82,10 @@ fn main() {
     );",
     (),
     ).unwrap();
+    let mut interval = time::interval(Duration::from_secs(10));
+
     loop {
-        let inow = Instant::now();
+        interval.tick().await;
 
         let output = Command::new("i3-msg").args(["-t", "get_tree"]).output().expect("Could not call i3-msg -t get_tree");
         let output = String::from_utf8(output.stdout).unwrap_or_default();
@@ -113,8 +116,6 @@ fn main() {
             "INSERT INTO tracking (class, title, idle, ts) values (?1, ?2, ?3, ?4);",
                     &[&focus_entry.class, &focus_entry.title, idle, &focus_entry.ts],
         ).unwrap();
-
-
-        sleep(Duration::from_secs(10) - inow.elapsed());
     }
+
 }
