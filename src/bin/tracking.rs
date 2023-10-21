@@ -1,4 +1,6 @@
 use rusqlite::Connection;
+use rusqlite::ErrorCode::*;
+use std::collections::VecDeque;
 use std::env;
 use std::path::Path;
 use std::time::Duration;
@@ -82,9 +84,13 @@ async fn main() {
     );",
     (),
     ).unwrap();
-    let mut interval = time::interval(Duration::from_secs(10));
 
-    loop {
+    let mut interval = time::interval(Duration::from_secs(10));
+    let mut cache: VecDeque<[String;4]> = VecDeque::new();
+
+    eprintln!("Started logging to {} at {}", db, Local::now());
+
+    'main: loop {
         interval.tick().await;
 
         let output = Command::new("i3-msg").args(["-t", "get_tree"]).output().expect("Could not call i3-msg -t get_tree");
@@ -108,14 +114,45 @@ async fn main() {
         };
 
         let idle = if Path::new(&idle_file).exists() || focus_entry.class.eq("idle") || focus_entry.class.eq("feh") {
-            "1"
+            "1".to_string()
         } else {
-            "0"
+            "0".to_string()
         };
-        conn.execute(
-            "INSERT INTO tracking (class, title, idle, ts) values (?1, ?2, ?3, ?4);",
-                    &[&focus_entry.class, &focus_entry.title, idle, &focus_entry.ts],
-        ).unwrap();
+
+        let entry = [focus_entry.class.clone(), focus_entry.title.clone(), idle, focus_entry.ts.clone()];
+
+        while cache.len() > 0 {
+            eprintln!("Cache not empty, attempting to write to db");
+            if let Some(centry) = cache.front() {
+                eprintln!("Attempting to insert entry: {:?}", entry);
+                if let Err(e) = conn.execute(
+                        "INSERT INTO tracking (class, title, idle, ts) values (?1, ?2, ?3, ?4);",
+                                    centry.clone(),
+                    ) {
+                    eprintln!("Error logging cached entry: {}", e);
+                    if e.sqlite_error().is_some_and(|e| e.code.eq(&DatabaseBusy) || e.code.eq(&DatabaseLocked) || e.code.eq(&DiskFull)) {
+                        eprintln!("Database busy, locked or disk full, caching in memory: {:?}", entry);
+                        cache.push_back(entry);
+                        continue 'main;
+                    } else {
+                        eprintln!("Unrecoverable error, dropping entry: {:?}", entry);
+                        cache.pop_front();
+                    }
+                } else {
+                    eprintln!("Successfully write cached entry to db: {:?}", entry);
+                    cache.pop_front();
+                }
+            }
+        }
+
+        if let Err(e) = conn.execute(
+                "INSERT INTO tracking (class, title, idle, ts) values (?1, ?2, ?3, ?4);",
+                        entry.clone(),
+            ) {
+                eprintln!("Error logging entry: {}", e);
+                eprintln!("Adding entry to cache: {:?}", entry);
+                cache.push_back(entry);
+            }
     }
 
 }
