@@ -124,7 +124,7 @@ async fn main() {
         while cache.len() > 0 {
             eprintln!("Cache not empty, attempting to write to db");
             if let Some(centry) = cache.front() {
-                eprintln!("Attempting to insert entry: {:?}", entry);
+                eprintln!("Attempting to insert entry: {:?}", centry);
                 if let Err(e) = conn.execute(
                         "INSERT INTO tracking (class, title, idle, ts) values (?1, ?2, ?3, ?4);",
                                     centry.clone(),
@@ -135,11 +135,11 @@ async fn main() {
                         cache.push_back(entry);
                         continue 'main;
                     } else {
-                        eprintln!("Unrecoverable error, dropping entry: {:?}", entry);
+                        eprintln!("Unrecoverable error, dropping entry: {:?}", centry);
                         cache.pop_front();
                     }
                 } else {
-                    eprintln!("Successfully write cached entry to db: {:?}", entry);
+                    eprintln!("Successfully write cached entry to db: {:?}", centry);
                     cache.pop_front();
                 }
             }
